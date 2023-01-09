@@ -67,21 +67,34 @@ def derivative_view(x):
     return 0.005 * np.e ** x
 
 
-def tangent(x, f_x, derivatative_f, a):
-    return derivatative_f(a) * x + f_x(a) - derivative_view(a) * view(a)
+def tangent(a, f_x, derivative, xa):
+    return f_x(a) + derivative(a) * (xa - a)
 
 
-hist = optimize(view, derivative_view, 7)
+hist = optimize(view, derivative_view, 10)
 d = {'num iter': hist[0], 'x': hist[1], 'f(x)': hist[2]}
 print(pd.DataFrame(data=d).to_string(index=False))
 
-xa = np.linspace(4.5, 6.25, 30)
+xa = np.linspace(4.5, 6.75, 30)
+xxa = np.linspace(4.6, 6.75, 60)
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.set_xlim(4.5, 6.25)
+ax.set_xlim(5, 6.75)
 ax.plot(xa, view(xa))
 
-ax.plot(xa, tangent(xa, view, derivative_view, hist[1][4]))
+tangent_line_one = tangent(hist[1][3], view, derivative_view, xxa)
+ax.plot(xxa[np.where(tangent_line_one > 0)], (tangent_line_one[np.where(tangent_line_one > 0)]))
+
+x_next = -view(hist[1][3]) / derivative_view(hist[1][3]) + hist[1][3]
+ax.scatter(x_next, 0, marker='x', color='r', s=100)
+ax.vlines(x_next, ymax=view(x_next), ymin=0, linestyle='--')
+
+tangent_line_two = tangent(hist[1][4], view, derivative_view, xxa)
+ax.plot(xxa[np.where(tangent_line_two > 0)], (tangent_line_two[np.where(tangent_line_two > 0)]))
+
+x_next = -view(hist[1][4]) / derivative_view(hist[1][4]) + hist[1][4]
+ax.scatter(x_next, 0, marker='x', color='r', s=50)
+ax.vlines(x_next, ymax=view(x_next), ymin=0, linestyle='--')
 
 ax.spines['left'].set_position('zero')
 ax.spines['right'].set_color('none')
