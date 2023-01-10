@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Eq must have second derivative; First and second derivatives must not change sign at the interval;
+# So we can find one root in the [a, b] interval.
+
 # to hide exp form
 pd.set_option('display.float_format', lambda x: '%.5f' % x)
 
@@ -53,8 +56,9 @@ def optimize(f_x, derivative_f, x, delta=0.0001):
 
 
 hist = optimize(f_x, derivative_f, x, delta)
-d = {'num iter': hist[0], 'x': hist[1], 'f(x)': hist[2]}
-# print(pd.DataFrame(data=d).to_string(index=False))
+d_first = {'num iter': hist[0], 'x': hist[1], 'f(x)': hist[2]}
+# will print history of iterations
+# print(pd.DataFrame(data=d_first).to_string(index=False))
 
 
 # principle of the algorithm on another, more convex function:
@@ -71,33 +75,40 @@ def tangent(a, f_x, derivative, xa):
     return f_x(a) + derivative(a) * (xa - a)
 
 
-hist = optimize(view, derivative_view, 10)
-d = {'num iter': hist[0], 'x': hist[1], 'f(x)': hist[2]}
-print(pd.DataFrame(data=d).to_string(index=False))
+hist_sec = optimize(view, derivative_view, 10)
+d_second = {'num iter': hist_sec[0], 'x': hist_sec[1], 'f(x)': hist_sec[2]}
+print(pd.DataFrame(data=d_second).to_string(index=False))
 
 xa = np.linspace(4.5, 6.75, 30)
-xxa = np.linspace(4.6, 6.75, 60)
+xxa = np.linspace(4.5, 6.75, 30)
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.set_xlim(5, 6.75)
+ax.set_xlim(4.5, 6.75)
 ax.plot(xa, view(xa))
-
-tangent_line_one = tangent(hist[1][3], view, derivative_view, xxa)
-ax.plot(xxa[np.where(tangent_line_one > 0)], (tangent_line_one[np.where(tangent_line_one > 0)]))
-
-x_next = -view(hist[1][3]) / derivative_view(hist[1][3]) + hist[1][3]
-ax.scatter(x_next, 0, marker='x', color='r', s=100)
-ax.vlines(x_next, ymax=view(x_next), ymin=0, linestyle='--')
-
-tangent_line_two = tangent(hist[1][4], view, derivative_view, xxa)
-ax.plot(xxa[np.where(tangent_line_two > 0)], (tangent_line_two[np.where(tangent_line_two > 0)]))
-
-x_next = -view(hist[1][4]) / derivative_view(hist[1][4]) + hist[1][4]
-ax.scatter(x_next, 0, marker='x', color='r', s=50)
-ax.vlines(x_next, ymax=view(x_next), ymin=0, linestyle='--')
-
 ax.spines['left'].set_position('zero')
 ax.spines['right'].set_color('none')
 ax.spines['bottom'].set_position('zero')
 ax.spines['top'].set_color('none')
+
+
+def plot_tangent(f_x, derivative, x_ax, num_iter, hist):
+    """
+    :param f_x: function to that tangent line will be plotted
+    :param derivative: derivative of above function
+    :param x_ax: ndarray for plotting
+    :param num_iter: sets iteration for which tangent line will be plotted
+    Function will plot line on the active axes
+    """
+    tangent_line = tangent(hist[1][num_iter], view, derivative, x_ax)
+    ax.plot(x_ax[np.where(tangent_line > 0)], (tangent_line[np.where(tangent_line > 0)]))
+    x_next = -f_x(hist[1][num_iter]) / derivative(hist[1][num_iter]) + hist[1][num_iter]
+    # dot on Ox
+    ax.scatter(x_next, 0, marker='x', color='r', s=45, label=f'X for {num_iter + 1} iter')
+    ax.legend()
+    # Function value in above dot. X_k+1 for iteration process.
+    ax.vlines(x_next, ymax=view(x_next), ymin=0, linestyle='--')
+
+
+plot_tangent(view, derivative_view, xxa, 3, hist_sec)
+plot_tangent(view, derivative_view, xxa, 4, hist_sec)
 plt.show()
