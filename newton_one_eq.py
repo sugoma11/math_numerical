@@ -29,7 +29,7 @@ ax.spines['top'].set_color('none')
 plt.show()
 
 # initialize start approximation and precision:
-x = -5.
+x = .5
 delta = 0.001
 
 
@@ -58,7 +58,7 @@ def optimize(f_x, derivative_f, x, delta=0.0001):
 hist = optimize(f_x, derivative_f, x, delta)
 d_first = {'num iter': hist[0], 'x': hist[1], 'f(x)': hist[2]}
 # will print history of iterations
-# print(pd.DataFrame(data=d_first).to_string(index=False))
+print(pd.DataFrame(data=d_first).to_string(index=False))
 
 
 # principle of the algorithm on another, more convex function:
