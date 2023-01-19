@@ -1,12 +1,28 @@
 import numpy as np
+from normalize import read_matrix, reg
 import time
+A, b = read_matrix()
+A, b = reg(A, b)
 
-cnt = int(0)
-x_2 = float(2.)
-x_3 = float(1.)
+x = []
+for k in range(len(A)):
+    x.append(A[k][k])
+c = x.copy()
 while 1:
-    x_1 = 0.5 * x_2 + 1/6 * x_3 + 1/3
-    x_2 = x_3 * 0.5 + 1 / 2
-    x_3 = 0.5 * x_1 - 0.25 * x_2 + 0.75
-    cnt += 1
-    print(f'Iter = {cnt}, x_1 = {x_1}, x_2 = {x_2} x_3 = {x_3}')
+    for i in range(len(A)):
+        for j in range(len(A)):
+            if i != j:
+                if c[i] > 0 and A[i][j] > 0 or c[i] < 0 and A[i][j] < 0:
+                    x[i] += A[i][j] / c[i]
+
+                elif ((c[i] > 0) and (A[i][j] < 0)) or ((c[i] < 0) and (A[i][j] > 0)):
+                    x[i] += -A[i][j] / c[i]
+
+        if c[i] > 0 and b[i] > 0 or c[i] < 0 and b[i] < 0:
+            x[i] -= b[i] / c[i]
+
+        elif ((c[i] > 0) and (b[i] < 0)) or ((c[i] < 0) and (b[i] > 0)):
+            x[i] += b[i] / c[i]
+
+    print(x)
+    time.sleep(1)

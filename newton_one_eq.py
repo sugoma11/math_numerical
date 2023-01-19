@@ -99,14 +99,14 @@ def plot_tangent(f_x, derivative, x_ax, num_iter, hist):
     :param num_iter: sets iteration for which tangent line will be plotted
     Function will plot line on the active axes
     """
-    tangent_line = tangent(hist[1][num_iter], view, derivative, x_ax)
+    tangent_line = tangent(hist[1][num_iter], f_x, derivative, x_ax)
     ax.plot(x_ax[np.where(tangent_line > 0)], (tangent_line[np.where(tangent_line > 0)]))
     x_next = -f_x(hist[1][num_iter]) / derivative(hist[1][num_iter]) + hist[1][num_iter]
     # dot on Ox
     ax.scatter(x_next, 0, marker='x', color='r', s=45, label=f'X for {num_iter + 1} iter')
     ax.legend()
     # Function value in above dot. X_k+1 for iteration process.
-    ax.vlines(x_next, ymax=view(x_next), ymin=0, linestyle='--')
+    ax.vlines(x_next, ymax=f_x(x_next), ymin=0, linestyle='--')
 
 
 plot_tangent(view, derivative_view, xxa, 3, hist_sec)
